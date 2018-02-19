@@ -41,7 +41,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Demo
 
-If you want to just demo test it, download [demo release](https://github.com/C0deboy/jjp-stats-scraper/releases/tag/demo) and run this bat file:
+If you want to just demo test it, download [demo release](https://github.com/C0deboy/jjp-stats-scraper/releases/tag/demo), put it to `demo` folder and run this bat file:
 
 ```
 demo/stats-scraper-demo.bat
