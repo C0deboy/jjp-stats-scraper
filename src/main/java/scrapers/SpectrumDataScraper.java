@@ -13,8 +13,8 @@ public class SpectrumDataScraper implements DataScraper {
   public static final String CURRENT_POSITION_KEY = "currentPosition";
   public static final String LAST_YEAR_POSITION_KEY = "lastYearPosition";
   private static final String NAME = "SpectrumRanking";
-  private static final String CURRENT_RANKING_FILE = "spectrumRanking2016.html";
-  private static final String LAST_YEAR_RANKING_FILE = "spectrumRanking2017.html";
+  private static final String CURRENT_RANKING_FILE = "spectrumRanking2017.html";
+  private static final String LAST_YEAR_RANKING_FILE = "spectrumRanking2016.html";
 
   @Override
   public String getName() {

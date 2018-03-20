@@ -76,12 +76,11 @@ public class LanguagesVersionDataScraper implements DataScraper {
         String version = getVersionFromReleaseInfo(latestReleaseInfo);
         languageData.put(VERSION_KEY, version);
 
-        langsVersionData.put(language, languageData);
+        langsVersionData.put(language.replace("+", "p"), languageData);
 
         StatusLogger.logSuccessFor(language);
 
       } catch (Exception e) {
-        StatusLogger.logErrorFor(currentLanguage, e.getClass().getSimpleName() + " - " + e.getLocalizedMessage());
         StatusLogger.logException(currentLanguage, e);
       }
 
