@@ -1,31 +1,26 @@
 package scrapers;
 
-import languageStatistics.StatisticsBuilder;
 import net.minidev.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class MeetupDataScraperTest {
+class MeetupDataScraperTest extends BaseScraperTest {
+
+  MeetupDataScraperTest() {
+    super(new MeetupDataScraper());
+  }
 
   @Test
-  public void getData() {
-    JSONObject meetupData = new MeetupDataScraper().getData();
-    StatisticsBuilder.saveToFile(meetupData, "src/test/statistics/meetup.json");
+  void getData() {
 
-    DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.getDefault());
-    String groupingSeparator = String.valueOf(symbols.getGroupingSeparator());
-
-    for (Map.Entry<String, Object> stats : meetupData.entrySet()) {
+    for (Map.Entry<String, Object> stats : scraperData.entrySet()) {
       if (MeetupDataScraper.excluded.contains(stats.getKey())) {
         continue;
       }
+
       JSONObject languageStatsJSON = (JSONObject) stats.getValue();
 
       JSONObject globalRanking = (JSONObject) languageStatsJSON.get(MeetupDataScraper.GLOBAL_RANKING_KEY);
@@ -38,19 +33,15 @@ public class MeetupDataScraperTest {
       String globalMembersCount = localRanking.getAsString(MeetupDataScraper.MEMBERS_KEY).replace(groupingSeparator, "");
       String globalPosition = localRanking.getAsString(MeetupDataScraper.POSITION_KEY);
 
-      assertNotNull(globalRanking);
+      assertThat(globalRanking).isNotNull();
       shouldBeNumeric(localMeetupsCount, MeetupDataScraper.MEETUPS_KEY);
       shouldBeNumeric(localMembersCount, MeetupDataScraper.MEMBERS_KEY);
       shouldBeNumeric(localPosition, MeetupDataScraper.POSITION_KEY);
 
-      assertNotNull(localRanking);
+      assertThat(localRanking).isNotNull();
       shouldBeNumeric(globalMeetupsCount, MeetupDataScraper.MEETUPS_KEY);
       shouldBeNumeric(globalMembersCount, MeetupDataScraper.MEMBERS_KEY);
       shouldBeNumeric(globalPosition, MeetupDataScraper.POSITION_KEY);
     }
-  }
-
-  private void shouldBeNumeric(String localMeetupsCount, String meetupsKey) {
-    assertTrue(meetupsKey + " should be numeric.", StringUtils.isNumeric(localMeetupsCount));
   }
 }

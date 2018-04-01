@@ -18,23 +18,18 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LanguagesVersionDataScraper implements DataScraper {
+public class LanguageVersionDataScraper implements DataScraper {
   public static final String RELEASE_INFO_KEY = "releaseInfo";
   public static final String RELEASE_DATE_KEY = "releaseDate";
   public static final String VERSION_KEY = "version";
-  private final String name = "LanguagesVersion";
+  public static final String NAME = "LanguagesVersion";
+
+  private Map<String, JSONObject> langsVersionData = new HashMap<>();
   private String currentLanguage;
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public JSONObject getData() {
+  public void scrapDataFor(String[] languages) {
     StatusLogger.logCollecting("Languages version data");
-
-    Map<String, JSONObject> langsVersionData = new HashMap<>();
 
     for (String language : languages) {
       this.currentLanguage = language;
@@ -83,14 +78,11 @@ public class LanguagesVersionDataScraper implements DataScraper {
       } catch (Exception e) {
         StatusLogger.logException(currentLanguage, e);
       }
-
     }
-
-    return new JSONObject(langsVersionData);
   }
 
   private String getVersionFromReleaseInfo(String latestReleaseInfo) {
-    Pattern versionPattern = Pattern.compile("\\d\\.\\d(\\.\\d)?");
+    Pattern versionPattern = Pattern.compile("\\d+\\.\\d+(\\.\\d+)?");
     Matcher versionMatcher = versionPattern.matcher(latestReleaseInfo);
     String version = "";
 
@@ -101,7 +93,7 @@ public class LanguagesVersionDataScraper implements DataScraper {
         version = latestReleaseInfo.split(" /")[0].trim().replaceAll("\\[.*]", "");
         StatusLogger.appendWarning("Not plain version, using: " + version);
       } catch (ArrayIndexOutOfBoundsException e) {
-        StatusLogger.logErrorFor("Cannot retrieve version from release info.");
+        StatusLogger.logError("Cannot retrieve version from release info.");
       }
     }
     return version;
@@ -148,5 +140,15 @@ public class LanguagesVersionDataScraper implements DataScraper {
       StatusLogger.appendWarning("Not full date, using: " + date);
       return date;
     }
+  }
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
+  public JSONObject getData() {
+    return new JSONObject(langsVersionData);
   }
 }

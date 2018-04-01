@@ -11,21 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class StackOverFlowDataScraper implements DataScraper {
+public class StackOverflowDataScraper implements DataScraper {
   public static final String QUESTIONS_COUNT_KEY = "questions";
   public static final String RANKING_KEY = "ranking";
-  private final String NAME = "StackOverFlow";
+  public static final String NAME = "StackOverFlow";
+
+  private Map<String, JSONObject> stackOverFlowData = new HashMap<>();
 
   @Override
-  public String getName() {
-    return NAME;
-  }
-
-  @Override
-  public JSONObject getData() {
+  public void scrapDataFor(String[] languages) {
     StatusLogger.logCollecting("Stack OverFlow data");
 
-    Map<String, JSONObject> stackOverFlowData = new HashMap<>();
     Map<Integer, String> rankingData = new TreeMap<>();
 
     for (String language : languages) {
@@ -55,6 +51,15 @@ public class StackOverFlowDataScraper implements DataScraper {
       stackOverFlowData.get(language).put(RANKING_KEY, ranking--);
     }
 
+  }
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
+  public JSONObject getData() {
     return new JSONObject(stackOverFlowData);
   }
 }

@@ -1,26 +1,42 @@
 package scrapers;
 
-import languageStatistics.StatisticsBuilder;
 import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class SpectrumDataScraperTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class SpectrumDataScraperTest extends BaseScraperTest {
+
+  SpectrumDataScraperTest() {
+    super(new SpectrumDataScraper());
+  }
 
   @Test
-  public void getData() {
-    JSONObject spectrumData = new SpectrumDataScraper().getData();
-    StatisticsBuilder.saveToFile(spectrumData, "src/test/statistics/spectrum.json");
+  void currentPositionShouldBeValidNumber() {
+    assertThat(scraperData).allSatisfy((language, languageStats) -> {
+      JSONObject stats = (JSONObject) languageStats;
 
-    for (Object languageStats : spectrumData.values()) {
-      JSONObject languageStatsJSON = (JSONObject) languageStats;
-      String currentPosition = languageStatsJSON.getAsString(SpectrumDataScraper.CURRENT_POSITION_KEY);
-      String lastYearPosition = languageStatsJSON.getAsString(SpectrumDataScraper.LAST_YEAR_POSITION_KEY);
+      String currentPosition = stats.getAsString(SpectrumDataScraper.LAST_YEAR_POSITION_KEY);
 
-      assertTrue(StackOverFlowDataScraper.QUESTIONS_COUNT_KEY + " should be numeric.", StringUtils.isNumeric(currentPosition));
-      assertTrue(StackOverFlowDataScraper.RANKING_KEY + " should be numeric.", StringUtils.isNumeric(lastYearPosition));
-    }
+      assertThat(StringUtils.isNumeric(currentPosition)).as(language + " ranking").isTrue();
+      assertThat(Integer.parseInt(currentPosition)).as(language + " ranking").isBetween(1, 20);
+    });
   }
+
+  @Test
+  void lastYearPositionShouldBeValidNumber() {
+    scraperData.forEach((language, languageStats) -> {
+      JSONObject stats = (JSONObject) languageStats;
+
+      String currentPosition = stats.getAsString(SpectrumDataScraper.LAST_YEAR_POSITION_KEY);
+
+      assertThat(currentPosition).as(language + " currentPosition").satisfies(StringUtils::isNumeric);
+
+      assertThat(Integer.parseInt(currentPosition)).as(language + " currentPosition").isBetween(1, 20);
+    });
+  }
+
 }

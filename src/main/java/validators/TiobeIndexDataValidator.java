@@ -7,13 +7,11 @@ import scrapers.TiobeIndexDataScraper;
 public class TiobeIndexDataValidator {
 
   public static void validate(String language, JSONObject languageData) {
-    try {
-      String currentPosition = languageData.getAsString(TiobeIndexDataScraper.CURRENT_POSITION_KEY);
-      String lastYearPosition = languageData.getAsString(TiobeIndexDataScraper.LAST_YEAR_POSITION_KEY);
 
-      ValidatorHelper.setContext(language);
-      ValidatorHelper.validateNumber(currentPosition, TiobeIndexDataScraper.CURRENT_POSITION_KEY);
-      ValidatorHelper.validateNumber(lastYearPosition, TiobeIndexDataScraper.LAST_YEAR_POSITION_KEY);
+    try {
+      DataValidator.setContext(language, languageData);
+      DataValidator.validateNumber(TiobeIndexDataScraper.CURRENT_POSITION_KEY, 1, 25);
+      DataValidator.validateNumber(TiobeIndexDataScraper.LAST_YEAR_POSITION_KEY, 1, 25);
 
       StatusLogger.logSuccessFor(language);
     } catch (Exception e) {

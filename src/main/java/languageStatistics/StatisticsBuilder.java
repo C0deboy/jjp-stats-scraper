@@ -1,110 +1,54 @@
 package languageStatistics;
 
 import net.minidev.json.JSONObject;
-import net.minidev.json.JSONStyle;
-import net.minidev.json.JSONValue;
-import scrapers.DataScraper;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public class StatisticsBuilder {
 
-  //All by default
-  public static String[] languages = {"C", "C++", "Java", "JavaScript", "Python", "Swift", "R", "Csharp", "Ruby", "PHP"};
-  private JSONObject completeStatistics = new JSONObject();
-  private ArrayList<DataScraper> scrapers = new ArrayList<>();
+  private Set<JSONObject> statisticsSet = new HashSet<>();
+  private String[] languages;
+  private JSONObject mergedStatistics = new JSONObject();
 
-  static public void saveToFile(JSONObject jsonObject, String filename) {
-
-    try (Writer out = new BufferedWriter(new OutputStreamWriter(
-        new FileOutputStream(filename), "UTF-8"))) {
-      out.write(jsonObject.toJSONString(JSONStyle.LT_COMPRESS));
-      StatusLogger.gap();
-      StatusLogger.logInfo("File " + filename + " saved.");
-    } catch (IOException e) {
-      StatusLogger.logException("Saving file " + filename, e);
-    }
+  public void assignStatsForEachLanguage(String[] languages) {
+    this.languages = languages;
   }
 
-  public static void saveStatisticsAndKeepOld(JSONObject completeStatistics, String filename) {
-      Path fileToMovePath = Paths.get(filename);
-      if (Files.notExists(fileToMovePath)) {
-        saveToFile(completeStatistics, filename);
-      }
-      else {
-        try (Reader reader = Files.newBufferedReader(fileToMovePath)) {
-          JSONObject oldStatistics = (JSONObject) JSONValue.parse(reader);
-          String oldStatisticDate = oldStatistics.getAsString("date");
 
-          String newFileName = appendDateToFileName(filename, oldStatisticDate);
-          Path targetPath = Paths.get(newFileName);
-          Files.move(fileToMovePath, targetPath);
-
-          StatusLogger.logInfo("Old statistics file renamed to: " + newFileName);
-          saveToFile(completeStatistics, filename);
-        } catch (IOException e) {
-          StatusLogger.logException("Renaming file " + filename, e);
-        }
-      }
+  public void add(JSONObject statistics) {
+    this.statisticsSet.add(statistics);
   }
 
-  private static String appendDateToFileName(String filename, String oldStatisticDate) {
-    String[] fileData = filename.split("\\.");
-    String name = fileData[0];
-    String extension = fileData[1];
-    return name + "-" + oldStatisticDate + "." + extension;
-  }
-
-  public void addScraper(DataScraper dataScraper) {
-    scrapers.add(dataScraper);
-  }
-
-  public void collectFor(String[] langs) {
-    languages = langs;
-  }
-
-  public JSONObject buildCompleteStatistics() {
+  public JSONObject buildMergedStatistics() {
     appendDateToStatistics();
-
-    Map<String, JSONObject> data = new HashMap<>();
-
-    for (DataScraper scraper : scrapers) {
-      data.put(scraper.getName(), scraper.getData());
-    }
 
     for (String language : languages) {
 
-      Map<String, JSONObject> languageData = new HashMap<>();
+      JSONObject languageData = new JSONObject();
 
-      for (Map.Entry<String, JSONObject> stats : data.entrySet()) {
-        languageData.put(stats.getKey(), (JSONObject) stats.getValue().get(language));
+      for (JSONObject statistics : statisticsSet) {
+
+        String name = statistics.getAsString("name");
+        JSONObject data = (JSONObject) statistics.get("data");
+        JSONObject scraperData = (JSONObject) data.get(language);
+
+        languageData.put(name, scraperData);
+        mergedStatistics.put(language.replace("++", "pp"), languageData);
       }
-
-      completeStatistics.put(language.replace("+", "p"), languageData);
     }
 
-    return completeStatistics;
+    return mergedStatistics;
   }
 
   private void appendDateToStatistics() {
     Date date = Calendar.getInstance().getTime();
     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
-    completeStatistics.put("date", sdf.format(date));
+    mergedStatistics.put("date", sdf.format(date));
   }
 }
 

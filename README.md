@@ -50,7 +50,7 @@ demo/stats-scraper-demo.bat
 or manually in cmd from project directory
 
 ```
-java -jar stats-scraper-1.0.0.jar -nogit
+java -jar stats-scraper-1.0.0.jar -no-git
 ```
 
 (Github data will be skipped)
@@ -77,9 +77,9 @@ Follow this [guide](https://help.github.com/articles/creating-a-personal-access-
 GithubAuthToken=token 22sadasdsa34r32412342134214324123
 ```
 
-Otherwise, you need to pass parameter `-nogit` when you are running program:
+Otherwise, you need to pass parameter `-no-git` when you are running program:
 ```
-java -jar stats-scraper-1.0.0.jar -nogit
+java -jar stats-scraper-1.0.0.jar -no-git
 ```
 or remove lines where `GithubDataScraper` is added to `StatisticsBuilder` at `App` class.
 

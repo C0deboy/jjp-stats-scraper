@@ -20,18 +20,14 @@ public class MeetupDataScraper implements DataScraper {
   public static final String POSITION_KEY = "ranking";
   public static final List<String> excluded = Arrays.asList("R", "C");
   private static final String URL = "https://www.meetup.com/pl-PL/topics/";
-  private final String name = "Meetup";
+  public static final String NAME = "Meetup";
+
+  private Map<String, JSONObject> meetupData = new HashMap<>();
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public JSONObject getData() {
+  public void scrapDataFor(String[] languages) {
     StatusLogger.logCollecting("meetup data");
 
-    Map<String, JSONObject> meetupData = new HashMap<>();
     Map<Integer, String> rankingData = new TreeMap<>();
     Map<Integer, String> globalRankingData = new TreeMap<>();
 
@@ -52,7 +48,7 @@ public class MeetupDataScraper implements DataScraper {
         int[] numbers = getNumbers(doc);
 
         if (numbers.length != 2) {
-          StatusLogger.logErrorFor("Collected invalid data. Should be 2 numbers (memebers, meetups).");
+          StatusLogger.logError("Collected invalid data. Should be 2 numbers (memebers, meetups).");
         } else {
           JSONObject localMeetupData = new JSONObject();
           localMeetupData.put(MEETUPS_KEY, String.format("%,d", numbers[0]));
@@ -94,7 +90,15 @@ public class MeetupDataScraper implements DataScraper {
 
     meetupData.put("C", meetupData.get("C++"));//C and C++ are the same
     meetupData.put("R", new JSONObject());//No data for R
+  }
 
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
+  public JSONObject getData() {
     return new JSONObject(meetupData);
   }
 

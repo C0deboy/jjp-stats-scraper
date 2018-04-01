@@ -54,7 +54,7 @@ public class StatusLogger {
     MDC.clear();
   }
 
-  public static void logErrorFor(String data) {
+  public static void logError(String data) {
     MDC.put("error", " FAILURE");
     LOG.info(data);
     MDC.clear();
@@ -66,6 +66,7 @@ public class StatusLogger {
     MDC.put("cause", cause);
     LOG.info(data);
     MDC.clear();
+    System.exit(1);
   }
 
   public static void logError() {
@@ -73,9 +74,8 @@ public class StatusLogger {
     System.exit(1);
   }
 
-  public static void logException(String language, Exception e) {
-    StatusLogger.logErrorFor(language, e.getClass().getSimpleName() + " - " + e.getLocalizedMessage());
-    LOG.error(language, e);
+  public static void logException(String message, Exception e) {
+    LOG.error(message, e);
     System.exit(1);
   }
 

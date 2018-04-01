@@ -21,7 +21,8 @@ public class GithubDataScraper implements DataScraper {
   public static final String PROJECT_URL_KEY = "url";
   public static final String RANKING_KEY = "ranking";
   public static final String MORE_THEN_1000_STARS_COUNT_KEY = "moreThen1000Stars";
-  private final String name = "Github";
+  public static final String NAME = "Github";
+  private Map<String, JSONObject> githubData = new HashMap<>();
   private final Properties properties;
 
   public GithubDataScraper() {
@@ -34,15 +35,9 @@ public class GithubDataScraper implements DataScraper {
   }
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public JSONObject getData() {
+  public void scrapDataFor(String[] languages) {
     StatusLogger.logCollecting("Github data");
 
-    Map<String, JSONObject> githubData = new HashMap<>();
     Map<Integer, String> rankingData = new TreeMap<>();
 
     String authToken = properties.getProperty("GithubAuthToken");
@@ -71,8 +66,6 @@ public class GithubDataScraper implements DataScraper {
     for (String language : rankingData.values()) {
       githubData.get(language).put(RANKING_KEY, ranking--);
     }
-
-    return new JSONObject(githubData);
   }
 
   private void getProjectsData(Map<Integer, String> rankingData, String authToken, String language, String url, JSONObject languageData) throws IOException {
@@ -104,6 +97,16 @@ public class GithubDataScraper implements DataScraper {
     String doc = Jsoup.connect(urlStars).header("Authorization", authToken).ignoreContentType(true).execute().body();
     JSONObject data = (JSONObject) JSONValue.parse(doc);
     languageData.put(MORE_THEN_1000_STARS_COUNT_KEY, String.format("%,d", (Integer) data.get("total_count")));
+  }
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
+  public JSONObject getData() {
+    return new JSONObject(githubData);
   }
 
   public void checkGithubApiLimits(String authToken) {
