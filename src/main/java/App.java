@@ -5,8 +5,6 @@ import languageStatistics.StatusLogger;
 import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fusesource.jansi.AnsiConsole;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import scrapers.DataScraper;
 import scrapers.GithubDataScraper;
 import scrapers.LanguageVersionDataScraper;
@@ -16,7 +14,6 @@ import scrapers.StackOverflowDataScraper;
 import scrapers.TiobeIndexDataScraper;
 import validators.CompleteStatisticsValidator;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;

@@ -6,7 +6,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import scrapers.DataScraper;
 import scrapers.GithubDataScraper;
 import scrapers.MeetupDataScraper;
-import scrapers.SpectrumDataScraper;
 import scrapers.StackOverflowDataScraper;
 
 import java.util.Set;
