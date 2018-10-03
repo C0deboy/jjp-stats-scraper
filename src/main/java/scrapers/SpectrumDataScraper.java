@@ -19,8 +19,8 @@ public class SpectrumDataScraper implements DataScraper {
     public static final String RANK_DATA_LANGUAGE = ".language";
     public static final String RANK_DATA_RANK = ".rank";
     public static final String NAME = "SpectrumRanking";
-    private static final String CURRENT_RANKING_FILE = "spectrumRanking2017.html";
-    private static final String LAST_YEAR_RANKING_FILE = "spectrumRanking2016.html";
+    private static final String CURRENT_RANKING_FILE = "spectrumRanking2018.html";
+    private static final String LAST_YEAR_RANKING_FILE = "spectrumRanking2017.html";
     private String[] languages;
     private JSONObject spectrumRankingData = new JSONObject();
 
