@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GithubDataScraperTest extends BaseScraperTest {
 
   GithubDataScraperTest() {
-    super(new GithubDataScraper());
+    super(new GithubDataScraper(languages));
   }
 
   @Test

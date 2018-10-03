@@ -4,10 +4,10 @@ import net.minidev.json.JSONObject;
 
 public interface DataScraper {
 
-  void scrapDataFor(String[] languages);
+    void scrapData();
 
-  String getName();
+    String getName();
 
-  JSONObject getData();
+    JSONObject getData();
 
 }

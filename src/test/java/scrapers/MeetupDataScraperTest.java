@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MeetupDataScraperTest extends BaseScraperTest {
 
   MeetupDataScraperTest() {
-    super(new MeetupDataScraper());
+    super(new MeetupDataScraper(languages));
   }
 
   @Test

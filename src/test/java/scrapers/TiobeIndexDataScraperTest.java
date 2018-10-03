@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 class TiobeIndexDataScraperTest extends BaseScraperTest {
 
   TiobeIndexDataScraperTest() {
-    super(new TiobeIndexDataScraper());
+    super(new TiobeIndexDataScraper(languages));
   }
 
   @Test

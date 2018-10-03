@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StackOverflowDataScraperTest extends BaseScraperTest {
 
   StackOverflowDataScraperTest() {
-    super(new StackOverflowDataScraper());
+    super(new StackOverflowDataScraper(languages));
   }
 
   @Test

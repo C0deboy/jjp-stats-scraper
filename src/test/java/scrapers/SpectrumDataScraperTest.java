@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SpectrumDataScraperTest extends BaseScraperTest {
 
   SpectrumDataScraperTest() {
-    super(new SpectrumDataScraper());
+    super(new SpectrumDataScraper(languages));
   }
 
   @Test

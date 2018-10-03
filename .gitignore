@@ -108,4 +108,5 @@ buildNumber.properties
 # End of https://www.gitignore.io/api/java,maven,intellij
 
 languagesVersions.json
-statistics.json
+statistics*.json
+src/test/statistics/*.json
