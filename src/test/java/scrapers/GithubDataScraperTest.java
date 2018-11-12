@@ -1,11 +1,16 @@
 package scrapers;
 
+import mockedScrapers.MockedGithubDataScraper;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+
+import java.io.File;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GithubDataScraperTest extends BaseScraperTest {
 
   GithubDataScraperTest() {
-    super(new GithubDataScraper(languages));
+    super(new MockedGithubDataScraper(languages));
   }
 
   @Test

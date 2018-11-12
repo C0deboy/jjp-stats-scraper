@@ -1,6 +1,7 @@
 package languageStatistics;
 
 import net.minidev.json.JSONObject;
+import scrapers.DataScraper;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -9,21 +10,23 @@ import java.util.Set;
 
 public class StatisticsBuilder {
 
-    private Set<JSONObject> statisticsSet = new HashSet<>();
     private String[] languages;
+    private Set<DataScraper> scrapers;
     private JSONObject statsForEachLanguage = new JSONObject();
 
-    public StatisticsBuilder(String[] languages) {
+    public StatisticsBuilder(String[] languages, Set<DataScraper> scrapers) {
         this.languages = languages;
-    }
-
-
-    public void add(JSONObject statistics) {
-        this.statisticsSet.add(statistics);
+        this.scrapers = scrapers;
     }
 
     public JSONObject buildStatisticsForEachLanguage() {
         appendDateToStatistics();
+
+        Set<JSONObject> statisticsSet = new HashSet<>();
+
+        for (DataScraper scraper : scrapers) {
+            statisticsSet.add(Statistics.build(scraper));
+        }
 
         for (String language : languages) {
 

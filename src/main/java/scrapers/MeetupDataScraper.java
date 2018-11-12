@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MeetupDataScraper implements DataScraper {
@@ -37,11 +38,11 @@ public class MeetupDataScraper implements DataScraper {
     public void scrapData() {
         StatusLogger.logCollecting("meetup data");
 
+        meetupData = Stream.of(languages).parallel()
+            .filter(this::filterExcluded)
+            .collect(Collectors.toMap(lang -> lang, this::scrap));
 
-        Stream.of(languages).parallel().forEach(this::scrap);
-
-
-        Integer ranking = rankingData.size();
+        int ranking = rankingData.size();
         for (String language : rankingData.values()) {
             ((JSONObject) meetupData.get(language).get(LOCAL_RANKING_KEY)).put(POSITION_KEY, ranking--);
         }
@@ -58,11 +59,16 @@ public class MeetupDataScraper implements DataScraper {
         meetupData.put("C", meetupData.get("C++"));//C and C++ are the same
     }
 
-    private void scrap(String language) {
+    private boolean filterExcluded(String language) {
         if (excluded.contains(language)) {
             StatusLogger.logSkipped(language, "excluded");
-            return;
+            return false;
+        } else {
+            return true;
         }
+    }
+
+    private JSONObject scrap(String language) {
 
         String topic = language;
         if (language.equals("R")) {
@@ -102,7 +108,8 @@ public class MeetupDataScraper implements DataScraper {
             StatusLogger.logException(language, e);
         }
         MeetupDataValidator.validate(language, languageData);
-        meetupData.put(language, languageData);
+
+        return languageData;
     }
 
     @Override

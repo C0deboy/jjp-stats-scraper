@@ -39,8 +39,8 @@ public class FilePersister {
 
                 String newFileName = appendToFileName(filename, oldStatisticDate);
                 Path targetPath = Paths.get(newFileName);
-                while(Files.exists(targetPath)) {
-                    newFileName = appendToFileName(filename,"OLD");
+                while (Files.exists(targetPath)) {
+                    newFileName = appendToFileName(newFileName, "OLD");
                     targetPath = Paths.get(newFileName);
                 }
                 Files.move(fileToMovePath, targetPath);

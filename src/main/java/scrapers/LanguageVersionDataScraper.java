@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class LanguageVersionDataScraper implements DataScraper {
@@ -40,10 +41,12 @@ public class LanguageVersionDataScraper implements DataScraper {
     @Override
     public void scrapData() {
         StatusLogger.logCollecting("Languages version data");
-        Stream.of(languages).parallel().forEach(this::scrap);
+
+        langsVersionData = Stream.of(languages).parallel()
+            .collect(Collectors.toMap(lang -> lang.replace("+", "p"), this::scrap));
     }
 
-    private void scrap(String language) {
+    private JSONObject scrap(String language) {
         this.currentLanguage = language;
 
         JSONObject languageData = new JSONObject();
@@ -53,7 +56,7 @@ public class LanguageVersionDataScraper implements DataScraper {
         specificUrls.put("Java", "https://pl.wikipedia.org/wiki/Java");
         specificUrls.put("JavaScript", "https://en.wikipedia.org/wiki/JavaScript");
         specificUrls.put("Csharp", "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)");
-        specificUrls.put("C++p", "https://en.wikipedia.org/wiki/C%2B%2B");
+        specificUrls.put("C++", "https://en.wikipedia.org/wiki/C%2B%2B");
 
         if (specificUrls.containsKey(language)) {
             commonUrl = specificUrls.get(language);
@@ -82,13 +85,13 @@ public class LanguageVersionDataScraper implements DataScraper {
             String version = getVersionFromReleaseInfo(latestReleaseInfo);
             languageData.put(VERSION_KEY, version);
 
-            langsVersionData.put(language.replace("+", "p"), languageData);
-
             StatusLogger.logSuccessFor(language);
 
         } catch (Exception e) {
             StatusLogger.logException(currentLanguage, e);
         }
+
+        return languageData;
     }
 
     private String getVersionFromReleaseInfo(String latestReleaseInfo) {

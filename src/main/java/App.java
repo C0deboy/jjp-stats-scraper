@@ -20,24 +20,25 @@ import java.util.concurrent.TimeUnit;
 
 
 public class App {
+
+    private static String[] languages = {"C", "C++", "Java", "JavaScript", "Python", "Swift", "R", "Csharp", "Ruby", "PHP"};
+    private Set<DataScraper> scrapers = new HashSet<>();
+
     public static void main(String[] args) {
-        long startTime = System.nanoTime();
         enableAnsiColors(args);
+        App app = new App();
+        app.addScraper(new TiobeIndexDataScraper(languages));
+        app.addScraper(new MeetupDataScraper(languages));
+        app.addScraper(new StackOverflowDataScraper(languages));
+        app.addScraper(new SpectrumDataScraper(languages));
+        app.addScraper(new GithubDataScraper(languages));
+        app.run();
+    }
 
-        String[] languages = {"C", "C++", "Java", "JavaScript", "Python", "Swift", "R", "Csharp", "Ruby", "PHP"};
+    public void run() {
+        long startTime = System.nanoTime();
 
-        StatisticsBuilder statisticsBuilder = new StatisticsBuilder(languages);
-
-        Set<DataScraper> scrapers = new HashSet<>();
-        scrapers.add(new TiobeIndexDataScraper(languages));
-        scrapers.add(new MeetupDataScraper(languages));
-        scrapers.add(new StackOverflowDataScraper(languages));
-        scrapers.add(new SpectrumDataScraper(languages));
-        scrapers.add(new GithubDataScraper(languages));
-
-        for (DataScraper scraper : scrapers) {
-            statisticsBuilder.add(Statistics.build(scraper));
-        }
+        StatisticsBuilder statisticsBuilder = new StatisticsBuilder(languages, scrapers);
 
         JSONObject completeStatistics = statisticsBuilder.buildStatisticsForEachLanguage();
         CompleteStatisticsValidator.validate(completeStatistics, languages, scrapers);
@@ -49,6 +50,10 @@ public class App {
 
         long elapsedTime = TimeUnit.SECONDS.convert(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
         StatusLogger.logInfo("Done in " + elapsedTime + " seconds.");
+    }
+
+    public void addScraper(DataScraper scraper) {
+        scrapers.add(scraper);
     }
 
     private static void enableAnsiColors(String[] args) {

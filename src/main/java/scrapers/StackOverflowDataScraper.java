@@ -7,9 +7,11 @@ import net.minidev.json.JSONValue;
 import org.jsoup.Jsoup;
 import validators.StackOverFlowDataValdator;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StackOverflowDataScraper implements DataScraper {
@@ -30,8 +32,8 @@ public class StackOverflowDataScraper implements DataScraper {
     public void scrapData() {
         StatusLogger.logCollecting("Stack OverFlow data");
 
-
-        Stream.of(languages).parallel().forEach(this::scrap);
+        stackOverFlowData = Stream.of(languages).parallel()
+            .collect(Collectors.toMap(lang -> lang, this::scrap));
 
         Integer ranking = rankingData.size();
         for (String language : rankingData.values()) {
@@ -40,12 +42,11 @@ public class StackOverflowDataScraper implements DataScraper {
 
     }
 
-    private void scrap(String language) {
-        String url = URL.replace("{language}", language.replace("+", "%2B"));
+    private JSONObject scrap(String language) {
         JSONObject languageData = new JSONObject();
 
         try {
-            String doc = Jsoup.connect(url).ignoreContentType(true).execute().body();
+            String doc = fetchData(language);
 
             JSONObject data = (JSONObject) JSONValue.parse(doc);
             JSONObject items = (JSONObject) ((JSONArray) data.get("items")).get(0);
@@ -59,7 +60,13 @@ public class StackOverflowDataScraper implements DataScraper {
         }
 
         StackOverFlowDataValdator.validate(language, languageData);
-        stackOverFlowData.put(language, languageData);
+
+        return languageData;
+    }
+
+    protected String fetchData(String language) throws IOException {
+        String url = URL.replace("{language}", language.replace("+", "%2B"));
+        return Jsoup.connect(url).ignoreContentType(true).execute().body();
     }
 
     @Override

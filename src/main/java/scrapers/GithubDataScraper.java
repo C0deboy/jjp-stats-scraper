@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GithubDataScraper implements DataScraper {
@@ -48,12 +49,13 @@ public class GithubDataScraper implements DataScraper {
     public void scrapData() {
         StatusLogger.logCollecting("Github data");
 
-        if(authToken == null || StringUtils.isBlank(authToken)) {
+        if (authToken == null || StringUtils.isBlank(authToken)) {
             StatusLogger.appendWarning("No auth token provided. Github data won't be scrapped.");
             return;
         }
 
-        Stream.of(languages).parallel().forEach(this::scrap);
+        githubData = Stream.of(languages).parallel()
+            .collect(Collectors.toMap(lang -> lang, this::scrap));
 
         int ranking = rankingData.size();
         for (String language : rankingData.values()) {
@@ -61,27 +63,32 @@ public class GithubDataScraper implements DataScraper {
         }
     }
 
-    private void scrap(String language) {
-        String escapedLanguage = language.replace("+", "%2B");
-        String url = URL.replace("{language}", escapedLanguage);
-        String urlStars = STARS_URL.replace("{language}", escapedLanguage);
+    private JSONObject scrap(String language) {
 
         JSONObject languageData = new JSONObject();
 
         try {
-            getProjectsData(language, url, languageData);
-            getMoreThan1000StarsData(languageData, urlStars);
+            getProjectsData(language, languageData);
+            getMoreThan1000StarsData(language, languageData);
         } catch (Exception e) {
             checkGithubApiLimits();
             StatusLogger.logException(language, e);
         }
         GithubDataValidator.validate(language, languageData);
-        githubData.put(language, languageData);
+
+        return languageData;
     }
 
-    private void getProjectsData(String language, String url, JSONObject languageData) throws IOException {
+    protected void getProjectsData(String language, JSONObject languageData) throws IOException {
+        String escapedLanguage = language.replace("+", "%2B");
+        String url = URL.replace("{language}", escapedLanguage);
+
         String doc = Jsoup.connect(url).header("Authorization", authToken).ignoreContentType(true).execute().body();
 
+        extractProjectData(language, languageData, doc);
+    }
+
+    protected void extractProjectData(String language, JSONObject languageData, String doc) {
         JSONObject data = (JSONObject) JSONValue.parse(doc);
         JSONArray top10List = (JSONArray) data.get("items");
         JSONArray top10Data = new JSONArray();
@@ -103,8 +110,14 @@ public class GithubDataScraper implements DataScraper {
         rankingData.put(count, language);
     }
 
-    private void getMoreThan1000StarsData(JSONObject languageData, String urlStars) throws IOException {
+    protected void getMoreThan1000StarsData(String language, JSONObject languageData) throws IOException {
+        String escapedLanguage = language.replace("+", "%2B");
+        String urlStars = STARS_URL.replace("{language}", escapedLanguage);
         String doc = Jsoup.connect(urlStars).header("Authorization", authToken).ignoreContentType(true).execute().body();
+        extractMoreThan1000StarsData(doc, languageData);
+    }
+
+    protected void extractMoreThan1000StarsData(String doc, JSONObject languageData) {
         JSONObject data = (JSONObject) JSONValue.parse(doc);
         languageData.put(MORE_THEN_1000_STARS_COUNT_KEY, String.format("%,d", (Integer) data.get("total_count")));
     }

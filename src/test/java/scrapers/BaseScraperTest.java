@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BaseScraperTest {
     static final String[] languages = {"C", "C++", "Java", "JavaScript", "Python", "Swift", "R", "Csharp", "Ruby", "PHP"};
-    private DataScraper dataScraper;
+    protected DataScraper dataScraper;
 
     JSONObject scraperData;
     String groupingSeparator;

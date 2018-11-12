@@ -1,14 +1,19 @@
 package scrapers;
 
+import mockedScrapers.MockedGithubDataScraper;
 import net.minidev.json.JSONObject;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class StackOverflowDataScraperTest extends BaseScraperTest {
 
   StackOverflowDataScraperTest() {
-    super(new StackOverflowDataScraper(languages));
+    super(new MockedGithubDataScraper(languages));
   }
 
   @Test
