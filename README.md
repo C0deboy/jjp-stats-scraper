@@ -1,3 +1,6 @@
+
+NOTE: I do not use this version anymore. It may not work. I have rewrited it using Kotlin -> [stats-scraper](https://github.com/C0deboy/stats-scraper)
+
 # Programing languages statistics scraper
 
 Tool which collects (scraps from web) statistics for programing languages in need for my site [jaki-jezyk-programowania.pl](https://jaki-jezyk-programowania.pl/).
